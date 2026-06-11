@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hy.mapper.ChargeMapper" >
+    <select id="findByPage" resultType="com.hy.pojo.Charge">
+        SELECT * FROM charge
+        <where>
+            <if test="patientName != null and patientName != ''">patient_name LIKE CONCAT('%', #{patientName}, '%')</if>
+            <if test="chargeType != null and chargeType != ''">AND charge_type = #{chargeType}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+            <if test="startTime != null">AND create_time >= #{startTime}</if>
+            <if test="endTime != null">AND create_time &lt;= #{endTime}</if>
+        </where>
+        ORDER BY create_time DESC LIMIT #{offset}, #{size}
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM charge
+        <where>
+            <if test="patientName != null and patientName != ''">patient_name LIKE CONCAT('%', #{patientName}, '%')</if>
+            <if test="chargeType != null and chargeType != ''">AND charge_type = #{chargeType}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+            <if test="startTime != null">AND create_time >= #{startTime}</if>
+            <if test="endTime != null">AND create_time &lt;= #{endTime}</if>
+        </where>
+    </select>
+    <select id="findById" resultType="com.hy.pojo.Charge">
+        SELECT * FROM charge WHERE id = #{id}
+    </select>
+    <insert id="insert">
+        INSERT INTO charge(register_id, patient_id, patient_name, charge_type, amount, status)
+        VALUES(#{charge.registerId}, #{charge.patientId}, #{charge.patientName}, #{charge.chargeType}, #{charge.amount}, 'unpaid')
+    </insert>
+    <update id="pay">
+        UPDATE charge SET status = 'paid', payment_method = #{paymentMethod}, update_time = NOW() WHERE id = #{id}
+    </update>
+    <delete id="delete">
+        DELETE FROM charge WHERE id = #{id}
+    </delete>
+    <select id="getTodayRevenue" resultType="java.math.BigDecimal">
+        SELECT SUM(amount) FROM charge WHERE status = 'paid' AND create_time >= DATE(NOW())
+    </select>
+    <select id="getTodayPrescriptionCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM charge WHERE charge_type = '药品费' AND create_time >= DATE(NOW())
+    </select>
+    
+    <select id="getYesterdayRevenue" resultType="java.math.BigDecimal">
+        SELECT SUM(amount) FROM charge 
+        WHERE status = 'paid' 
+        AND create_time >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+        AND create_time &lt; DATE(NOW())
+    </select>
+    
+    <select id="getYesterdayPrescriptionCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM charge 
+        WHERE charge_type = '药品费' 
+        AND create_time >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+        AND create_time &lt; DATE(NOW())
+    </select>
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hy.mapper.SpaMapper" >
+
+    <select id="getHosCount" resultType="java.lang.Integer">
+        SELECT count(*) from patient
+    </select>
+    <select id="getPatCount" resultType="java.lang.Integer">
+        SELECT count(*) from patient
+    </select>
+    <select id="getHosPatCount" resultType="java.util.Map">
+        SELECT h.hospital_name,count(p.id) AS count FROM hospital h LEFT JOIN patient p on h.id = p.hospital_id GROUP BY h.hospital_name
+    </select>
+    <select id="getSJHosCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM hospital WHERE hospital_level = '三甲'
+    </select>
+    <select id="getPatAge" resultType="java.util.Map">
+        SELECT
+        SUM(CASE WHEN patient_age BETWEEN 0 and 19 THEN 1 ELSE 0 END)As A,
+        SUM(CASE WHEN patient_age BETWEEN 20 and 29 THEN 1 ELSE 0 END)As B,
+        SUM(CASE WHEN patient_age BETWEEN 30 and 39 THEN 1 ELSE 0 END)As C,
+        SUM(CASE WHEN patient_age BETWEEN 40 and 49 THEN 1 ELSE 0 END)As D,
+        SUM(CASE WHEN patient_age BETWEEN 50 and 59 THEN 1 ELSE 0 END)As E
+        FROM patient
+    </select>
+    <select id="getPatSex" resultType="java.lang.Integer">
+        SELECT count(*) FROM patient WHERE patient_gender = '男'
+    </select>
+</mapper>

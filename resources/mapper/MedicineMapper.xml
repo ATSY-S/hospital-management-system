@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hy.mapper.MedicineMapper" >
+    <select id="findByPage" resultType="com.hy.pojo.Medicine">
+        SELECT * FROM medicine
+        <where>
+            <if test="name != null and name != ''">name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="code != null and code != ''">AND code LIKE CONCAT('%', #{code}, '%')</if>
+        </where>
+        ORDER BY create_time DESC LIMIT #{offset}, #{size}
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM medicine
+        <where>
+            <if test="name != null and name != ''">name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="code != null and code != ''">AND code LIKE CONCAT('%', #{code}, '%')</if>
+        </where>
+    </select>
+    <select id="findById" resultType="com.hy.pojo.Medicine">
+        SELECT * FROM medicine WHERE id = #{id}
+    </select>
+    <insert id="insert">
+        INSERT INTO medicine(name, code, specification, unit, price, stock, min_stock, supplier, status)
+        VALUES(#{med.name}, #{med.code}, #{med.specification}, #{med.unit}, #{med.price}, #{med.stock}, #{med.minStock}, #{med.supplier}, 1)
+    </insert>
+    <update id="update">
+        UPDATE medicine
+        <set>
+            <if test="med.name != null">name = #{med.name},</if>
+            <if test="med.specification != null">specification = #{med.specification},</if>
+            <if test="med.unit != null">unit = #{med.unit},</if>
+            <if test="med.price != null">price = #{med.price},</if>
+            <if test="med.stock != null">stock = #{med.stock},</if>
+            <if test="med.minStock != null">min_stock = #{med.minStock},</if>
+            <if test="med.supplier != null">supplier = #{med.supplier},</if>
+            <if test="med.status != null">status = #{med.status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{med.id}
+    </update>
+    <delete id="delete">
+        DELETE FROM medicine WHERE id = #{id}
+    </delete>
+</mapper>

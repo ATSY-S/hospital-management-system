@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hy.mapper.PatientMapper" >
+    <insert id="insertPat">
+        INSERT INTO patient(patient_name,patient_phone,patient_idcard,patient_gender,
+        patient_age,patient_birthday,patient_address,patient_blood_type,
+        patient_allergy,hospital_id
+        )values(#{pat.patientName},#{pat.patientPhone},#{pat.patientIdcard},#{pat.patientGender},
+        #{pat.patientAge},#{pat.patientBirthday},#{pat.patientAddress},#{pat.patientBloodType},
+        #{pat.patientAllergy},#{pat.hospitalId}
+        )
+    </insert>
+    <update id="updatePat">
+        update patient
+        <set>
+            <if test="pat.patientName!=null and pat.patientName!=''">
+                patient_name=#{pat.patientName},
+            </if>
+            <if test="pat.patientPhone!=null and pat.patientPhone!=''">
+                patient_phone=#{pat.patientPhone},
+            </if>
+            <if test="pat.patientIdcard!=null and pat.patientIdcard!=''">
+                patient_idcard=#{pat.patientIdcard},
+            </if>
+            <if test="pat.patientGender!=null and pat.patientGender!=''">
+                patient_gender=#{pat.patientGender},
+            </if>
+            <if test="pat.patientAge!=null and pat.patientAge!=''">
+                patient_age=#{pat.patientAge},
+            </if>
+            <if test="pat.patientBirthday!=null and pat.patientBirthday!=''">
+                patient_birthday=#{pat.patientBirthday},
+            </if>
+            <if test="pat.patientAddress!=null and pat.patientAddress!=''">
+                patient_address=#{pat.patientAddress},
+            </if>
+            <if test="pat.patientBloodType!=null and pat.patientBloodType!=''">
+                patient_blood_type=#{pat.patientBloodType},
+            </if>
+            <if test="pat.patientAllergy!=null and pat.patientAllergy!=''">
+                patient_allergy=#{pat.patientAllergy},
+            </if>
+            <if test="pat.hospitalId!=null and pat.hospitalId!=''">
+                hospital_id=#{pat.hospitalId}
+            </if>
+
+        </set>
+        <where>
+            id = #{pat.id}
+        </where>
+    </update>
+    <delete id="deletePat">
+        delete from patient where id = #{id}
+    </delete>
+
+
+    <select id="findPatList" resultType="com.hy.pojo.Patient">
+        select * from patient
+    </select>
+    <select id="findPatByName" resultType="com.hy.pojo.Patient">
+        select * from patient where patient_name LIKE '%${patName}%'
+    </select>
+    
+    <select id="getInHospitalCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM patient WHERE discharge_status = 0
+    </select>
+    
+    <select id="getYesterdayInHospitalCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM patient 
+        WHERE discharge_status = 0 
+        AND admission_date &lt; CURDATE()
+    </select>
+    
+    <select id="getAgeDistribution" resultType="java.util.Map">
+        SELECT 
+            CASE 
+                WHEN patient_age &lt; 18 THEN '18岁以下'
+                WHEN patient_age BETWEEN 18 AND 35 THEN '18-35岁'
+                WHEN patient_age BETWEEN 36 AND 55 THEN '36-55岁'
+                ELSE '55岁以上'
+            END as name,
+            COUNT(*) as value
+        FROM patient
+        GROUP BY name
+        ORDER BY name
+    </select>
+</mapper>

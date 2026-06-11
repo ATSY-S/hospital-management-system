@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hy.mapper.SysNotificationMapper" >
+    <select id="findByUserId" resultType="com.hy.pojo.SysNotification">
+        SELECT * FROM sys_notification WHERE user_id = #{userId} ORDER BY create_time DESC LIMIT #{offset}, #{size}
+    </select>
+    <select id="countByUserId" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM sys_notification WHERE user_id = #{userId}
+    </select>
+    <select id="countUnread" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM sys_notification WHERE user_id = #{userId} AND is_read = 0
+    </select>
+    <update id="markRead">
+        UPDATE sys_notification SET is_read = 1 WHERE id = #{id}
+    </update>
+    <update id="markAllRead">
+        UPDATE sys_notification SET is_read = 1 WHERE user_id = #{userId}
+    </update>
+    <delete id="delete">
+        DELETE FROM sys_notification WHERE id = #{id}
+    </delete>
+</mapper>

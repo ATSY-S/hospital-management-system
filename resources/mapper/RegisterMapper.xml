@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hy.mapper.RegisterMapper" >
+    <select id="findByPage" resultType="com.hy.pojo.Register">
+        SELECT * FROM register
+        <where>
+            <if test="patientName != null and patientName != ''">patient_name LIKE CONCAT('%', #{patientName}, '%')</if>
+            <if test="department != null and department != ''">AND department = #{department}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+            <if test="date != null">AND register_date = #{date}</if>
+        </where>
+        ORDER BY create_time DESC LIMIT #{offset}, #{size}
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM register
+        <where>
+            <if test="patientName != null and patientName != ''">patient_name LIKE CONCAT('%', #{patientName}, '%')</if>
+            <if test="department != null and department != ''">AND department = #{department}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+            <if test="date != null">AND register_date = #{date}</if>
+        </where>
+    </select>
+    <select id="findById" resultType="com.hy.pojo.Register">
+        SELECT * FROM register WHERE id = #{id}
+    </select>
+    <insert id="insert">
+        INSERT INTO register(patient_id, patient_name, hospital_id, hospital_name, department, doctor_name, register_date, register_time, status, amount)
+        VALUES(#{reg.patientId}, #{reg.patientName}, #{reg.hospitalId}, #{reg.hospitalName}, #{reg.department}, #{reg.doctorName}, #{reg.registerDate}, #{reg.registerTime}, 'pending', #{reg.amount})
+    </insert>
+    <update id="update">
+        UPDATE register
+        <set>
+            <if test="reg.department != null">department = #{reg.department},</if>
+            <if test="reg.doctorName != null">doctor_name = #{reg.doctorName},</if>
+            <if test="reg.registerDate != null">register_date = #{reg.registerDate},</if>
+            <if test="reg.registerTime != null">register_time = #{reg.registerTime},</if>
+            <if test="reg.status != null">status = #{reg.status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{reg.id}
+    </update>
+    <delete id="delete">
+        DELETE FROM register WHERE id = #{id}
+    </delete>
+    <select id="getRegisterTrend" resultType="java.util.Map">
+        SELECT DATE(register_date) as date, COUNT(*) as count FROM register
+        WHERE register_date >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        GROUP BY DATE(register_date) ORDER BY date
+    </select>
+    <select id="getDepartmentCount" resultType="java.util.Map">
+        SELECT department as name, COUNT(*) as value FROM register
+        WHERE register_date >= DATE(NOW())
+        GROUP BY department
+    </select>
+    <select id="getTodayRegisterCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM register WHERE register_date = DATE(NOW())
+    </select>
+    
+    <select id="getYesterdayRegisterCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM register WHERE register_date = DATE_SUB(NOW(), INTERVAL 1 DAY)
+    </select>
+</mapper>
